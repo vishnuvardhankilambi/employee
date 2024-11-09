@@ -105,9 +105,7 @@ public class EmployeeService {
         EmployeeEntity employeeById = getEmployeeById(employee.getEmployeeId());
         validateDate(employee.getDoj());
         if (Objects.isNull(employeeById)) {
-            {
-                return false;
-            }
+                return true;
 
         } else {
             throw new EmployeeException("Employee already present");
