@@ -1,8 +1,6 @@
 package com.imagginnovate.employee.model.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,20 +10,20 @@ import lombok.Setter;
 @Setter
 public class Employee {
 
-    @NotNull
+    @NotNull(message = "employeeId is mandatory")
     public Long employeeId;
-    @NotBlank
+    @NotBlank(message = "firstName is mandatory")
     public String firstName;
-    @NotBlank
+    @NotBlank(message = "lastName is mandatory")
     public String lastName;
     @NotBlank
-    @Email
+    @Email(message = "email should be valid")
     public String email;
-    @NotBlank
+    @NotBlank(message = "phoneNumber is mandatory")
     public String phoneNumber;
-    @NotBlank
+    @NotBlank(message = "Date of Joining is mandatory")
     public String doj;
-
+    @DecimalMin(value = "1.0", message = "salary is mandatory")
     public Double salary;
 
 }

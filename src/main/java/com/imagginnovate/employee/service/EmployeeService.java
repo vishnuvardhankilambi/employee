@@ -36,7 +36,7 @@ public class EmployeeService {
         if (validateEmployee(employee)) {
             EmployeeEntity employeeToSave = EmployeeMapper.mapToEmployee(employee);
             EmployeeEntity createdEmployee = employeeRepository.save(employeeToSave);
-            return "Employee creation successful for" + createdEmployee.firstName +StringUtils.EMPTY+ createdEmployee.lastName;
+            return "Employee creation successful for" + createdEmployee.firstName + StringUtils.EMPTY + createdEmployee.lastName;
         } else return "Employee Not Created as ";
 
     }
@@ -46,35 +46,33 @@ public class EmployeeService {
         EmployeeTaxResponse.EmployeeTaxResponseBuilder taxResponse = EmployeeTaxResponse.builder();
         double taxAmount = 0.0;
         double cessAmount = 0.0;
-        double lop= 0.0;
+        double lop = 0.0;
         double totalYearlySalary = 0.0;
         LocalDate dateOfJoining = LocalDate.parse(employee.doj);
         LocalDate financialYearStart = LocalDate.of(LocalDate.now().getYear(), Month.APRIL, 1);
-        LocalDate financialYearEnd= LocalDate.of(LocalDate.now().plusYears(1).getYear(), Month.MARCH, 31);
+        LocalDate financialYearEnd = LocalDate.of(LocalDate.now().plusYears(1).getYear(), Month.MARCH, 31);
 
         long monthsWorked = ChronoUnit.MONTHS.between(dateOfJoining, financialYearEnd);
-        if(dateOfJoining.isBefore(financialYearStart)){
-            monthsWorked = ChronoUnit.MONTHS.between(financialYearStart,financialYearEnd);
-            totalYearlySalary= employee.getSalary() * monthsWorked;
-        }
-        else{
+        if (dateOfJoining.isBefore(financialYearStart)) {
+            monthsWorked = ChronoUnit.MONTHS.between(financialYearStart, financialYearEnd);
+            totalYearlySalary = employee.getSalary() * monthsWorked;
+        } else {
 
-            if(dateOfJoining.getDayOfMonth()!=1){
+            if (dateOfJoining.getDayOfMonth() != 1) {
                 int i = 31 - dateOfJoining.getDayOfMonth();
                 lop = i * (employee.getSalary() / 30);
             }
-            monthsWorked = monthsWorked -1;
-            totalYearlySalary= employee.getSalary() * monthsWorked+lop;
+            monthsWorked = monthsWorked - 1;
+            totalYearlySalary = employee.getSalary() * monthsWorked + lop;
         }
-        if(totalYearlySalary > 1000000){
-            taxAmount = (totalYearlySalary-1000000)*0.2+50000;
-        }
-        else if(totalYearlySalary> 500000){
-            taxAmount = (totalYearlySalary-500000)*0.1+12500;
-        }else if(totalYearlySalary>250000){
+        if (totalYearlySalary > 1000000) {
+            taxAmount = (totalYearlySalary - 1000000) * 0.2 + 50000;
+        } else if (totalYearlySalary > 500000) {
+            taxAmount = (totalYearlySalary - 500000) * 0.1 + 12500;
+        } else if (totalYearlySalary > 250000) {
             taxAmount = (totalYearlySalary - 250000) * 0.05;
         }
-        if(totalYearlySalary > 2500000){
+        if (totalYearlySalary > 2500000) {
             cessAmount = (totalYearlySalary - 2500000) * 0.02;
         }
         taxResponse.taxAmount(taxAmount)
@@ -82,9 +80,7 @@ public class EmployeeService {
                 .employeeId(employee.getEmployeeId())
                 .firstName(employee.getFirstName())
                 .lastName(employee.lastName);
-    return taxResponse.build();
-
-
+        return taxResponse.build();
 
 
     }
@@ -107,42 +103,20 @@ public class EmployeeService {
     private boolean validateEmployee(Employee employee) throws EmployeeException {
 
         EmployeeEntity employeeById = getEmployeeById(employee.getEmployeeId());
-        validateEmail(employee.getEmail());
         validateDate(employee.getDoj());
         if (Objects.isNull(employeeById)) {
-            if (!StringUtils.isNotEmpty(employee.getFirstName())
-                    && !StringUtils.isNotEmpty(employee.getLastName())
-                    && !StringUtils.isNotEmpty(employee.getEmail())
-                    && !StringUtils.isNotEmpty(employee.getPhoneNumber())
-                    && !(employee.getSalary() > 0)) {
+            {
                 return false;
             }
 
         } else {
-            return false;
-        }
-        return true;
-    }
-
-
-    private boolean validateEmail(String email) throws EmployeeException {
-
-        String regex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        Pattern pattern = Pattern.compile(regex);
-        if (StringUtils.isEmpty(email)) {
-            throw new EmployeeException("Email Can't be empty");
-        }
-        if(pattern.matcher(email).matches()){
-            return true;
-        }
-        else{
-           throw new EmployeeException("Invalid Email Provided");
+            throw new EmployeeException("Employee already present");
         }
     }
+
 
     private boolean validateDate(String date) throws EmployeeException {
         try {
-            log.info("");
             LocalDate.parse(date);
             return true;
         } catch (DateTimeParseException de) {

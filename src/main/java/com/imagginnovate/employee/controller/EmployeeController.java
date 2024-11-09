@@ -20,7 +20,13 @@ public class EmployeeController {
     EmployeeService employeeService;
     @PostMapping("/addEmployee")
     public ResponseEntity<String> addEmployee(@RequestBody @Valid Employee employee) throws EmployeeException {
-    return ResponseEntity.ok(employeeService.createEmployee(employee));
+    try{
+        String e = employeeService.createEmployee(employee);
+        return ResponseEntity.ok(e);
+    }catch (Exception e)
+    {
+        return ResponseEntity.unprocessableEntity().body(e.getMessage());
+    }
 
 
     }
